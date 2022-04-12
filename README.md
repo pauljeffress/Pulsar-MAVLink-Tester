@@ -2,6 +2,7 @@
 
 My goal here is twofold;  
 **First** - I'd like to pull together all I have learnt and achieved when talking MAVLink between an Arduino board and ArduPilot running on my Flight Controller (Cube Orange).
+
 **Second** - I'd like to share it in the hope that someone else can benefit from it, just like I have from everyone else out there doing this stuff before me.  In particular, the those that started (Juan Pedro López & Pedro Albuquerque....thank you, thank you, thank you) and answered questions in the following two threads in the ArduPilot forum.  I would highly encourage anyone interested in this space to read both of those threads from start to finish, you will learn a lot along the way.
 
 MAVLink and Arduino: step by step
@@ -28,12 +29,17 @@ My [Adafruit Feather M4 CAN](https://www.adafruit.com/product/4759) Arduino boar
 Make sure you connect as follows;
 
 AutoPilot       Arduino
+
 GPS2 Port       Serial1
+
 GND ----------- GND
+
 TX  ----------- RX
+
 RX  ----------- TX
 
 On the Arduino I configure Serial1 to operate at 57600bps with
+
     Serial1.begin(57600);
 
 On the AutoPilot I use Mission Planner to configure ArduPilot and set GPS 2 port to 57600 and MAVLink v1.
