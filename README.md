@@ -50,28 +50,28 @@ If you have checked the wiring and the Serialx port number and you still don't s
 
 Ultimately you should see something like this, but it will be different for your system.
 
->mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 >according to seq nums!  
->mavlink_receive() - MSG RCVD - magic:254 seq:203 src sysid:1 src compid:1 >msgid#:36=SERVO_OUTPUT_RAW - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:204 src sysid:1 src compid:1 >msgid#:65=RC_CHANNELS - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:205 src sysid:1 src compid:1 >msgid#:35=RC_CHANNELS_RAW - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:206 src sysid:1 src compid:1 >msgid#:0=HEARTBEAT Type:11 Autopilot:3 BaseMode:1 CustomMode/Flightmode:4 >SystemStatus:5 MavlinkVersion:3  
->mavlink_receive() - MSG RCVD - magic:254 seq:207 src sysid:1 src compid:1 >msgid#:36=SERVO_OUTPUT_RAW - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:208 src sysid:1 src compid:1 >msgid#:65=RC_CHANNELS - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:209 src sysid:1 src compid:1 >msgid#:35=RC_CHANNELS_RAW - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:120 src sysid:1 src compid:0 >msgid#:0=HEARTBEAT Type:27 Autopilot:8 BaseMode:4 CustomMode/Flightmode:0 >SystemStatus:4 MavlinkVersion:3  
->mavlink_receive() - MSG RCVD - magic:254 seq:210 src sysid:1 src compid:1 >msgid#:111=TIMESYNC - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:211 src sysid:1 src compid:1 >msgid#:36=SERVO_OUTPUT_RAW - undecoded  
->mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 >according to seq nums!  
->mavlink_receive() - MSG RCVD - magic:254 seq:127 src sysid:1 src compid:1 >msgid#:65=RC_CHANNELS - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:128 src sysid:1 src compid:1 >msgid#:35=RC_CHANNELS_RAW - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:129 src sysid:1 src compid:1 >msgid#:0=HEARTBEAT Type:11 Autopilot:3 BaseMode:1 CustomMode/Flightmode:4 >SystemStatus:5 MavlinkVersion:3  
->mavlink_receive() - MSG RCVD - magic:254 seq:130 src sysid:1 src compid:1 >msgid#:36=SERVO_OUTPUT_RAW - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:131 src sysid:1 src compid:1 >msgid#:65=RC_CHANNELS - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:132 src sysid:1 src compid:1 >msgid#:35=RC_CHANNELS_RAW - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:120 src sysid:1 src compid:0 >msgid#:0=HEARTBEAT Type:27 Autopilot:8 BaseMode:4 CustomMode/Flightmode:0 >SystemStatus:4 MavlinkVersion:3  
->mavlink_receive() - MSG RCVD - magic:254 seq:133 src sysid:1 src compid:1 >msgid#:36=SERVO_OUTPUT_RAW - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:134 src sysid:1 src compid:1 >msgid#:65=RC_CHANNELS - undecoded  
->mavlink_receive() - MSG RCVD - magic:254 seq:135 src sysid:1 src compid:1 >msgid#:35=RC_CHANNELS_RAW - undecoded  
+>mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 according to seq nums!  
+>mavlink_receive() - MSG RCVD - magic:254 seq:203 src sysid:1 src compid:1 msgid#:36=SERVO_OUTPUT_RAW - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:204 src sysid:1 src compid:1 msgid#:65=RC_CHANNELS - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:205 src sysid:1 src compid:1 msgid#:35=RC_CHANNELS_RAW - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:206 src sysid:1 src compid:1 msgid#:0=HEARTBEAT Type:11 Autopilot:3 BaseMode:1 CustomMode/Flightmode:4 SystemStatus:5 MavlinkVersion:3  
+>mavlink_receive() - MSG RCVD - magic:254 seq:207 src sysid:1 src compid:1 msgid#:36=SERVO_OUTPUT_RAW - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:208 src sysid:1 src compid:1 msgid#:65=RC_CHANNELS - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:209 src sysid:1 src compid:1 msgid#:35=RC_CHANNELS_RAW - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:120 src sysid:1 src compid:0 msgid#:0=HEARTBEAT Type:27 Autopilot:8 BaseMode:4 CustomMode/Flightmode:0 SystemStatus:4 MavlinkVersion:3  
+>mavlink_receive() - MSG RCVD - magic:254 seq:210 src sysid:1 src compid:1 msgid#:111=TIMESYNC - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:211 src sysid:1 src compid:1 msgid#:36=SERVO_OUTPUT_RAW - undecoded  
+>mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 according to seq nums!  
+>mavlink_receive() - MSG RCVD - magic:254 seq:127 src sysid:1 src compid:1 msgid#:65=RC_CHANNELS - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:128 src sysid:1 src compid:1 msgid#:35=RC_CHANNELS_RAW - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:129 src sysid:1 src compid:1 msgid#:0=HEARTBEAT Type:11 Autopilot:3 BaseMode:1 CustomMode/Flightmode:4 SystemStatus:5 MavlinkVersion:3  
+>mavlink_receive() - MSG RCVD - magic:254 seq:130 src sysid:1 src compid:1 msgid#:36=SERVO_OUTPUT_RAW - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:131 src sysid:1 src compid:1 msgid#:65=RC_CHANNELS - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:132 src sysid:1 src compid:1 msgid#:35=RC_CHANNELS_RAW - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:120 src sysid:1 src compid:0 msgid#:0=HEARTBEAT Type:27 Autopilot:8 BaseMode:4 CustomMode/Flightmode:0 SystemStatus:4 MavlinkVersion:3  
+>mavlink_receive() - MSG RCVD - magic:254 seq:133 src sysid:1 src compid:1 msgid#:36=SERVO_OUTPUT_RAW - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:134 src sysid:1 src compid:1 msgid#:65=RC_CHANNELS - undecoded  
+>mavlink_receive() - MSG RCVD - magic:254 seq:135 src sysid:1 src compid:1 msgid#:35=RC_CHANNELS_RAW - undecoded  
 
 
 
