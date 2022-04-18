@@ -11,26 +11,19 @@
  */
 void loop()
 {
+    int ledState = 0;
+    
     menuDo();   // check for and action user menus.
     
-    Serial.print(".");  // Print stuff to show we are running...
+    //Serial.print(".");  // Print stuff to show we are running...
 
     if (MavRecOn)   mavlink_receive();
 
 
-
-
-
-    // Example of some debug statements
-    if (DebugNormalOperation == true)
-    {
-        Serial.println("loop() - Debug debug debug...");
-    }
-
-    // Some more fake actions to execute to show we are running...
-    digitalWrite(LED_BUILTIN, HIGH); // Switch the builtin led on
-    delay(250);
-    digitalWrite(LED_BUILTIN, LOW); // Switch the builtin led off
-    delay(100);
+    // Some more actions to execute to show loop() is running...
+    // Non blocking LED toggler
+    if((millis() % 2000) > 1000) ledState = 1;
+    else                         ledState = 0;
+    digitalWrite(LED_BUILTIN, ledState);
 
 } // END - loop()

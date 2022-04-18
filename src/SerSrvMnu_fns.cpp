@@ -46,6 +46,8 @@ void menuPrint()
     Serial.println("[5].......mavlink_unrequest_streaming_params_from_ap()");
     Serial.println("[6].......mavlink_set_arm_ap()");
     Serial.println("[7].......mavlink_set_disarm_ap()");
+    Serial.println("[8].......mavlink_test_set_one_param_on_ap()");
+    Serial.println("[9].......mavlink_test_request_one_param_on_ap()");
     
     Serial.println();
     
@@ -129,6 +131,23 @@ void menuDo()
             // This menu item will run and then immediately return to the main menu.
             menuClearScreen();
             mavlink_set_disarm_ap();
+        }
+        else if (MenuChoice == "8")
+        {
+            menuClearScreen();
+            MavRecOn = true;    // when you set a param on the AP, it will respond with a MAVLink msg
+                                // to confirm it was actually set.  So in order to see that msg we need
+                                // our mavlink_receive() function to be call in loop().
+            mavlink_test_set_one_param_on_ap();
+            menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
+        }
+        else if (MenuChoice == "9")
+        {
+            menuClearScreen();
+            MavRecOn = true;    // in order to see the result of the below command, we need
+                                // our mavlink_receive() function to be call in loop().
+            mavlink_test_request_one_param_from_ap();
+            menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
         }
         else if (MenuChoice == "d")
         {

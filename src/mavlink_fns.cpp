@@ -62,6 +62,9 @@ void mavlink_fmx_send_heartbeat_to_ap()
  *
  * A basic test of reading one param from the AP using the "PARAM_REQUEST_READ" #20 msg method. https://mavlink.io/en/messages/common.html#PARAM_REQUEST_READ
  *
+ * The parameter we want test the request with is hard coded in this function as "BATT_ARM_VOLT".
+ * See mavlink_request_one_param_on_ap() for a function that lets you request any param.
+ * 
  *============================*/
 void mavlink_test_request_one_param_from_ap()
 {
@@ -91,6 +94,9 @@ void mavlink_test_request_one_param_from_ap()
  *
  * A basic test of setting one param on the AP using the "PARAM_SET" #23 msg method. https://mavlink.io/en/messages/common.html#PARAM_SET
  *
+ * The parameter we want test set, is hard coded in this function as "BATT_ARM_VOLT".
+ * See mavlink_set_one_param_on_ap() for a function that lets you request any param.
+ * 
  *============================*/
 void mavlink_test_set_one_param_on_ap()
 {
@@ -280,7 +286,7 @@ void mavlink_set_flightmode_ap(float desired_flightmode)
     uint8_t _target_system = AP_SYS_ID;     // MAVLink System ID of the autopilot.
     uint8_t _target_component = AP_COMP_ID; // MAVLink Component ID of the autopilot.
 
-    // Build the COMMAND_LONG / MAV_CMD_COMPONENT_ARM_DISARM message.
+    // Build the COMMAND_LONG / MAV_CMD_DO_SET_MODE message.
     // components of the MAVLink COMMAND_LONG message - https://mavlink.io/en/messages/common.html#COMMAND_LONG
     uint16_t _cl_command = MAV_CMD_DO_SET_MODE; // https://mavlink.io/en/messages/common.html#MAV_CMD_DO_SET_MODE
     uint8_t _cl_confirmation = 0;               // always 0 for first transmission, then incremented. https://mavlink.io/en/services/command.html#COMMAND_LONG

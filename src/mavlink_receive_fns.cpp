@@ -14,6 +14,10 @@
 
 // Define any globals that only the functions in this file need.
 
+uint8_t sys1comp1_expectedSeqNum = 0;
+uint8_t sys1comp0_expectedSeqNum = 0;
+
+
 // Define functions.
 
 /*============================
@@ -51,6 +55,25 @@ void mavlink_receive()
     {
 #ifdef MAVLINK_DEBUG
         // debugs to show the msg # of the ones I'm seeing but not interested in.
+        
+        // Check if we have missed any msg's my checking seq number of received MAVLink msg against last on from that sysID/compID.
+        // Note (1): the first msg we receive from a particular sysID/compID will always fail the below test, thats ok and expected.
+        // Note (2): my Cube Orange identifies itself as sysID 1, compID 1.  The ADSB controller that is on the Cube Orange carrier board
+        // also talks MAVLink and identifies itself as sysID 1, compID 0.  So you see msgs from both in my streams.
+        if ((msg.sysid == 1) && (msg.compid == 1))  // i.e we have message from my autopilot
+        {
+            if (msg.seq != (sys1comp1_expectedSeqNum))    // is it the next one in the sequence?
+                debugPrintln("mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 according to seq nums!");
+            sys1comp1_expectedSeqNum = msg.seq+1;   // as its a uint8_t it will roll correctly at seq = 255, the next will be seq = 0.
+        }
+        // I have commented out the below check, as the ADSB controller does not emit sequential seq nums.
+        // if ((msg.sysid == 1) && (msg.compid == 0))  // i.e we have message from my ADSB controller
+        // {
+        //     if (msg.seq != (sys1comp0_expectedSeqNum))    // is it the next one in the sequence?
+        //         debugPrintln("mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:0 according to seq nums!");
+        //     sys1comp0_expectedSeqNum = msg.seq+1;   // as its a uint8_t it will roll correctly at seq = 255, the next will be seq = 0.
+        // }
+
         debugPrint("mavlink_receive() - MSG RCVD -");
         debugPrint(" magic:");
         debugPrintInt(msg.magic);
@@ -403,7 +426,7 @@ void mavlink_receive()
         //============================
         // DEFAULT - should not happen, but programing it defensively
         default:
-            // Serial.println("we hit the default: in mavlink packet decode switch");
+            Serial.println("mavlink_receive() - WARNING - we hit the default: in mavlink packet decode switch");
             break;
 
         } // END - of msg decoder switch
