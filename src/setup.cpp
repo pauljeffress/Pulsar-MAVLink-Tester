@@ -3,6 +3,7 @@
  */
 
 #include "debug_fns.h"
+#include "SerSrvMnu_fns.h"
 
 /*
  *  setup()
@@ -19,4 +20,6 @@ void setup()
 
     Serial1.begin(57600);   // Initialise Serial1 port at 57600bps
                             // Arduino 2nd serial port (a.k.a Serial1) is wired to AutoPilot GPS2 port (see README.md for additional details)
+
+    menuExit(); // display a message telling user how to open the menus.
 }
