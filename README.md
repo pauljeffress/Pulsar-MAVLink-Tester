@@ -24,24 +24,25 @@ https://discuss.ardupilot.org/t/mavlink-step-by-step/9629
 Once the code is running on your Arduino, open the Serial Monitor and press 'm' to open the menu system in the tester.
 You should see a menu something like this;
 
-> Pulsar MAVLink Tester
-> 
->
->[1].......Toggle mavlink_receive() in loop(): [OFF]
->[2].......mavlink_request_datastream()
->[3].......mavlink_unrequest_datastream()
->[4].......mavlink_request_streaming_params_from_ap()
->[5].......mavlink_unrequest_streaming_params_from_ap()
->[6].......mavlink_set_arm_ap()
->[7].......mavlink_set_disarm_ap()
->[8].......mavlink_test_set_one_param_on_ap()
->[9].......mavlink_test_request_one_param_on_ap()
->
->[d].......Toggle Debug - state: [OFF]
->
->[x].......Exit this Menu
->
->Enter your choice/number: 
+> Pulsar MAVLink Tester  
+>   
+>[1].......Toggle mavlink_receive() in loop(): [OFF]  
+>[2].......mavlink_request_datastream()  
+>[3].......mavlink_unrequest_datastream()  
+>[4].......mavlink_request_streaming_params_from_ap()  
+>[5].......mavlink_unrequest_streaming_params_from_ap()  
+>[6].......mavlink_set_arm_ap()  
+>[7].......mavlink_set_disarm_ap()  
+>[8].......mavlink_test_set_one_param_on_ap()  
+>[9].......mavlink_test_request_one_param_on_ap()  
+>  
+>[d].......Toggle Debug - state: [OFF]  
+>  
+>[x].......Exit this Menu  
+>  
+>Enter your choice/number:   
+>:::::
+
 
 I'd suggest you start by using option 1, to turn on the mavlink_receive() function in loop(), and then press 'x' to get out of the menus.
 This will just display and decode what it can from your autopilot if it is correctly connected to the Arduino.  If you don't see any MAVLink messages check your wiring and also check that you are using the right Serialx port in setup().  In my case I have Serial1 wired to the autopilot, you may be using another port?
