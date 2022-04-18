@@ -148,7 +148,7 @@ void mavlink_test_set_one_param_on_ap();
 bool mavlink_set_one_param_on_ap(char *name, int32_t value_int, float value_float, uint8_t valuetype);
 void mavlink_set_arm_ap();
 void mavlink_set_disarm_ap();
-void mavlink_set_flightmode_ap(float desired_flightmode);
+void mavlink_set_flightmode_ap(uint8_t desired_flightmode);
 // from mavlink_stream_fns.cpp
 void mavlink_request_datastream();
 void mavlink_unrequest_datastream();

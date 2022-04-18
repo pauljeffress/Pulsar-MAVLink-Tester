@@ -273,7 +273,7 @@ void mavlink_set_disarm_ap()
  *   ROVER_MODE_INITIALIZING=16
  *   ROVER_MODE_ENUM_END=17
  *============================*/
-void mavlink_set_flightmode_ap(float desired_flightmode)
+void mavlink_set_flightmode_ap(uint8_t desired_flightmode)
 {
     debugPrintln("mavlink_set_flightmode_ap() - START");
 
@@ -290,8 +290,9 @@ void mavlink_set_flightmode_ap(float desired_flightmode)
     // components of the MAVLink COMMAND_LONG message - https://mavlink.io/en/messages/common.html#COMMAND_LONG
     uint16_t _cl_command = MAV_CMD_DO_SET_MODE; // https://mavlink.io/en/messages/common.html#MAV_CMD_DO_SET_MODE
     uint8_t _cl_confirmation = 0;               // always 0 for first transmission, then incremented. https://mavlink.io/en/services/command.html#COMMAND_LONG
-    float _cl_param1 = 1;                       // always MAV_MODE_FLAG_CUSTOM_MODE_ENABLED=1
-    float _cl_param2 = desired_flightmode;      // Flightmode
+    float _cl_param1 = 1;                       // for ArduPilot, always MAV_MODE_FLAG_CUSTOM_MODE_ENABLED=1   (according to https://ardupilot.org/dev/docs/mavlink-get-set-flightmode.html#set-the-flightmode-with-mav-cmd-do-set-mode)
+    float _cl_param2 = (float)desired_flightmode;      // Flightmode                        (according to https://ardupilot.org/dev/docs/mavlink-get-set-flightmode.html#set-the-flightmode-with-mav-cmd-do-set-mode)
+                                                // and see here for mode names and numbers for ROVER https://github.com/ardupilot/ardupilot/blob/master/Rover/mode.h#L21
     float _cl_param3 = 0;                       // Not used, so set to zero.
     float _cl_param4 = 0;                       // Not used, so set to zero.
     float _cl_param5 = 0;                       // Not used, so set to zero.

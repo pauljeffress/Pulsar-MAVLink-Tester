@@ -424,9 +424,26 @@ void mavlink_receive()
         }
 
         //============================
+        case MAVLINK_MSG_ID_STATUSTEXT: //  #253  https://mavlink.io/en/messages/common.html#STATUSTEXT
+        {
+            mavlink_statustext_t packet;
+            mavlink_msg_statustext_decode(&msg, &packet);
+
+#ifdef MAVLINK_DEBUG
+            debugPrint("=STATUSTEXT");
+            debugPrint(" severity:");
+            Serial.print(packet.severity);
+            debugPrint(" text:");
+            Serial.print(packet.text);
+#endif
+
+            break;
+        }
+
+        //============================
         // DEFAULT - should not happen, but programing it defensively
         default:
-            Serial.println("mavlink_receive() - WARNING - we hit the default: in mavlink packet decode switch");
+            Serial.print(" - WARNING - we hit the default: in mavlink packet decode switch");
             break;
 
         } // END - of msg decoder switch
