@@ -311,3 +311,47 @@ void mavlink_set_flightmode_ap(uint8_t desired_flightmode)
     debugPrintln("mavlink_set_flightmode_ap() - END");
 
 } // END - mavlink_set_flightmode_ap()
+
+
+/*============================
+ * mavlink_cmd_preflight_reboot_shutdown_ap()
+ *
+ * Change the ArduPilot Flightmode of the AP.
+ * We issue a COMMAND_LONG containing the command MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN (246) https://mavlink.io/en/messages/common.html#MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN
+ *
+ *============================*/
+void mavlink_cmd_preflight_reboot_ap()
+{
+    debugPrintln("mavlink_cmd_preflight_reboot_ap() - START");
+
+    // Prep source and dest MAVLink addressing info, to be used in below actions.
+    uint8_t _system_id = FMX_SYS_ID;        // MAVLink System ID of this device.
+    uint8_t _component_id = FMX_COMP_ID;    // MAVLink Component ID of this device.
+    uint8_t _target_system = AP_SYS_ID;     // MAVLink System ID of the autopilot.
+    uint8_t _target_component = AP_COMP_ID; // MAVLink Component ID of the autopilot.
+
+    // Build the COMMAND_LONG / MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN message.
+    // components of the MAVLink COMMAND_LONG message - https://mavlink.io/en/messages/common.html#COMMAND_LONG
+    uint16_t _cl_command = MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN; // https://mavlink.io/en/messages/common.html#MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN
+    uint8_t _cl_confirmation = 0;               // always 0 for first transmission, then incremented. https://mavlink.io/en/services/command.html#COMMAND_LONG
+    float _cl_param1 = 1;                       // 0: Do nothing for autopilot, 1: Reboot autopilot, 2: Shutdown autopilot, 3: Reboot autopilot and keep it in the bootloader until upgraded.
+    float _cl_param2 = 0;                       // Not used, so set to zero.
+    float _cl_param3 = 0;                       // Not used, so set to zero.
+    float _cl_param4 = 0;                       // Not used, so set to zero.
+    float _cl_param5 = 0;                       // Not used, so set to zero.
+    float _cl_param6 = 0;                       // Not used, so set to zero.
+    float _cl_param7 = 0;                       // Not used, so set to zero.
+
+    // Initialize the required buffers
+    mavlink_message_t msg;
+    uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+
+    // Pack and send the message
+    mavlink_msg_command_long_pack(_system_id, _component_id, &msg, _target_system, _target_component, _cl_command, _cl_confirmation, _cl_param1, _cl_param2, _cl_param3, _cl_param4, _cl_param5, _cl_param6, _cl_param7);
+    uint16_t len = mavlink_msg_to_send_buffer(buf, &msg); // put message into our send buffer and also get it's size in bytes.
+    Serial1.write(buf, len);                              // Write data to serial port byte by byte.
+
+    debugPrintln("mavlink_cmd_preflight_reboot_ap() - END");
+
+} // END - mavlink_cmd_preflight_reboot_ap()
+

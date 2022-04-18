@@ -50,6 +50,7 @@ void menuPrint()
     Serial.println("[9].......mavlink_test_request_one_param_on_ap()");
     Serial.println("[a].......mavlink_set_flightmode_ap(0)- MANUAL");
     Serial.println("[b].......mavlink_set_flightmode_ap(3)- STEERING");
+    Serial.println("[r].......mavlink_cmd_preflight_reboot_ap()");
 
     Serial.println();
 
@@ -161,7 +162,14 @@ void menuDo()
             mavlink_set_flightmode_ap(3);   // 3 = STEERING (see https://github.com/ardupilot/ardupilot/blob/master/Rover/mode.h#L21)
             menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
         }
-
+        else if (MenuChoice == "r")
+        {
+            menuClearScreen();
+            MavRecOn = true;    // in order to see the result of the below command, we need
+                                // our mavlink_receive() function to be call in loop().
+            mavlink_cmd_preflight_reboot_ap();   
+            menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
+        }
         else if (MenuChoice == "x")
         {
             menuExit();
