@@ -258,7 +258,7 @@ void mavlink_set_disarm_ap()
  * We issue a COMMAND_LONG containing the command MAV_CMD_DO_SET_MODE (#176) https://mavlink.io/en/messages/common.html#MAV_CMD_DO_SET_MODE
  * As discussed in ArduPilot doco - https://ardupilot.org/dev/docs/mavlink-get-set-flightmode.html
  *
- * The Flightmodes are defined in ardupilotmega.h from the MAVLink library.
+ * The Flightmodes are defined in ardupilotmega.h from the MAVLink library. https://github.com/mavlink/c_library_v1/blob/079d909ee331205d47652b208057d265338dc839/ardupilotmega/ardupilotmega.h#L906
  *   ROVER_MODE_MANUAL=0
  *   ROVER_MODE_ACRO=1
  *   ROVER_MODE_STEERING=3
