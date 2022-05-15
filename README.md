@@ -15,7 +15,6 @@ https://discuss.ardupilot.org/t/mavlink-step-by-step/9629
 - [Pulsar MAVLink Tester](#pulsar-mavlink-tester)
   - [Table of Contents](#table-of-contents)
   - [Operation](#operation)
-- [> Pulsar MAVLink Tester](#-pulsar-mavlink-tester)
   - [Coding Environment](#coding-environment)
   - [Arduino to AutoPilot Setup](#arduino-to-autopilot-setup)
 
@@ -24,38 +23,38 @@ https://discuss.ardupilot.org/t/mavlink-step-by-step/9629
 
 Once the code is running on your Arduino, open the Serial Monitor and press 'm' to open the menu system in the tester.
 You should see a menu something like this;
+```
+Pulsar MAVLink Tester
+========================='
+[1].......Toggle mavlink_receive() in loop(): [OFF]
+[2].......STREAM   - mavlink_request_datastream>(MAV_DATA_STREAM_RAW_SENSORS)
+[3].......STREAM   - mavlink_unrequest_datastream(MAV_DATA_STREAM_ALL);
+[4].......STREAM   - mavlink_request_streaming_params_from_ap()
+[5].......STREAM   - mavlink_unrequest_streaming_params_from_ap()
 
-> Pulsar MAVLink Tester
-=========================
->[1].......Toggle mavlink_receive() in loop(): [OFF]
->[2].......STREAM   - mavlink_request_datastream>(MAV_DATA_STREAM_RAW_SENSORS)
->[3].......STREAM   - mavlink_unrequest_datastream(MAV_DATA_STREAM_ALL);
->[4].......STREAM   - mavlink_request_streaming_params_from_ap()
->[5].......STREAM   - mavlink_unrequest_streaming_params_from_ap()
->
->[6].......ARM      - mavlink_set_arm_ap()
->[7].......DISarm   - mavlink_set_disarm_ap()
->
->[8].......SET      - mavlink_test_set_one_param_on_ap()
->[9].......REQUEST  - mavlink_test_request_one_param_on_ap()
->
->[r].......REBOOT   - mavlink_cmd_preflight_reboot_ap()
->
->[M].......FLT MODE - mavlink_set_flightmode_ap(0)- MANUAL
->[H].......FLT MODE - mavlink_set_flightmode_ap(4)- HOLD
->[A].......FLT MODE - mavlink_set_flightmode_ap(10)- AUTO
->
->[C].......MISSION  - clear local data
->[L].......MISSION  - load dummy local data
->[P].......MISSION  - print my local data
->[U].......MISSION  - upload local data to AP
->[E].......MISSION  - erase AP's mission
->
->[x].......Exit this Menu
->
->Enter your choice/number: 
->
+[6].......ARM      - mavlink_set_arm_ap()
+[7].......DISarm   - mavlink_set_disarm_ap()
 
+[8].......SET      - mavlink_test_set_one_param_on_ap()
+[9].......REQUEST  - mavlink_test_request_one_param_on_ap()
+
+[r].......REBOOT   - mavlink_cmd_preflight_reboot_ap()
+
+[M].......FLT MODE - mavlink_set_flightmode_ap(0)- MANUAL
+[H].......FLT MODE - mavlink_set_flightmode_ap(4)- HOLD
+[A].......FLT MODE - mavlink_set_flightmode_ap(10)- AUTO
+
+[C].......MISSION  - clear local data
+[L].......MISSION  - load dummy local data
+[P].......MISSION  - print my local data
+[U].......MISSION  - upload local data to AP
+[E].......MISSION  - erase AP's mission
+
+[x].......Exit this Menu
+
+Enter your choice/number: 
+
+```
 
 I'd suggest you start by using option 1, to turn on the mavlink_receive() function in loop(), and then press 'x' to get out of the menus.
 
@@ -65,27 +64,28 @@ If you have checked the wiring and the Serialx port number and you still don't s
 
 Ultimately you should see something like this, but it will be different for your system.
 
-> mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 according to seq nums!
-> MSG RCVD - magic:254 seq:32 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:33 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:34 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:35 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:36 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:37 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:38 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:39 sysid:1 compid:1 msgid#:111=TIMESYNC - undecoded
-> MSG RCVD - magic:254 seq:40 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:41 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 according to seq nums!
-> MSG RCVD - magic:254 seq:160 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:161 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:162 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:163 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:164 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:165 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:166 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-> MSG RCVD - magic:254 seq:167 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
-
+```
+mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 according to seq nums!
+MSG RCVD - magic:254 seq:32 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:33 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:34 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:35 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:36 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:37 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:38 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:39 sysid:1 compid:1 msgid#:111=TIMESYNC - undecoded
+MSG RCVD - magic:254 seq:40 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:41 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:1 according to seq nums!
+MSG RCVD - magic:254 seq:160 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:161 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:162 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:163 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:164 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:165 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:166 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+MSG RCVD - magic:254 seq:167 sysid:1 compid:1 msgid#:0=HEARTBEAT Type:11 APclass:3 BaseMode:65 DISarmed Custom/Flightmode:0 MANUAL SysStat:5 MavVer:3
+```
 
 ## Coding Environment
 
