@@ -8,6 +8,11 @@
 #ifndef MAVLINK_FNS_H
 #define MAVLINK_FNS_H
 
+//#define FMX // used to control code compilation when I copy some of my mavlink fns from this repository into 
+            // my Pulsar MAVLink Tester repository.
+            // It should be defined here when we are compiling for my Pulsar Boat project
+            // It should NOT be defined when compiling for my Pulsar MAVLink Tester code.
+
 #include "Arduino.h"    // helps with the "types" used here.
 #include <TimeLib.h>    // https://github.com/PaulStoffregen/Time
 
@@ -29,12 +34,17 @@
 #define FMX_MAVLINK_MAX_TRYS 3                // How many times the FMX should try to execute a MAVLink message and get a positive result/ack.
 #define FMX_MAVLINK_RX_WINDOW_REGULAR_MS 4000 // milliSeconds - when we are parsing inbound MAVLink data from the AP, typically looking for or expecting
                                               // something specific, how long should we parse for.
-#define FMX_MAVLINK_RX_WINDOW_LONG_MS 8000    // milliSeconds - similar role to FMX_MAVLINK_RX_WINDOW_REGULAR_MS above but for when I want to wait longer
+#define FMX_MAVLINK_RX_WINDOW_LONG_MS 15000    // milliSeconds - similar role to FMX_MAVLINK_RX_WINDOW_REGULAR_MS above but for when I want to wait longer
 
 #define PULSAR_MISSION_MAX_ITEMS 4             // the max number of mission items the FMX can work with.
 #define PULSAR_MISSION_ITEM_SEQ_PLACEHOLDER 66 // I use this when I initialise a GlobalMission_t as it is outside of the range
                                                // I will ever use.  So I can test for it (for example when checking if my struct
                                                // has a valid mission in it)and act accordingly.
+
+#define MAV_REQ_PARAM_FAIL  200     // When I need to indicate (to the ground) that we failed in requesting a param from the AP,
+                                    // I set the param type field to this.  I use 200 as the proper MAV_PARAM_TYPEs as per below link 
+                                    // never get this high.
+                                    // https://mavlink.io/en/messages/common.html#MAV_PARAM_TYPE
 
 /* define any enums */
 
@@ -143,9 +153,6 @@ extern GlobalMissionSubset_t global_mission_subset;
 // from mavlink_fns.cpp
 void initMAVLinkSettings();
 void mavlink_fmx_send_heartbeat_to_ap();
-void mavlink_test_request_one_param_from_ap();
-void mavlink_test_set_one_param_on_ap();
-bool mavlink_set_one_param_on_ap(char *name, int32_t value_int, float value_float, uint8_t valuetype);
 void mavlink_set_arm_ap();
 void mavlink_set_disarm_ap();
 void mavlink_set_flightmode_ap(uint8_t desired_flightmode);
@@ -156,7 +163,14 @@ void mavlink_unrequest_datastream(uint8_t data_stream);
 void mavlink_request_streaming_params_from_ap();
 void mavlink_unrequest_streaming_params_from_ap();
 // from mavlink_receive_fns.cpp
+bool mavlink_receive_param_value(char *name, int32_t *value_int, float *value_float, uint8_t valuetype);
 void mavlink_receive();
+// from mavlink_param_get_fns.cpp
+bool mavlink_get_one_param_from_ap(char *name, int32_t *value_int, float *value_float, uint8_t valuetype);
+void mavlink_test_request_one_param_from_ap();
+// from mavlink_param_set_fns.cpp
+bool mavlink_set_one_param_on_ap(char *name, int32_t value_int, float value_float, uint8_t valuetype);
+void mavlink_test_set_one_param_on_ap();
 // from mavlink_mission_fns.cpp
 PulsarMavMissionResult_t mission_clear_all_ap();
 PulsarMavMissionResult_t mission_upload_to_ap();

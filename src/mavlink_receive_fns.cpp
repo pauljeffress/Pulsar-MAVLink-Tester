@@ -8,22 +8,171 @@
  */
 
 #include "mavlink_fns.h"
-
+#include <TimeLib.h>
 #include "debug_fns.h"
 #include "timer_fns.h"
+#ifdef FMX
+    #include "FmxSettings_fns.h"
+#endif
 
 // Define any globals that only the functions in this file need.
 
-uint8_t sys1comp1_expectedSeqNum = 0;
-uint8_t sys1comp0_expectedSeqNum = 0;
-
+uint8_t sys1comp1_expectedSeqNum = 0; // used to keep track of MAVLink sequence numbers of msgs received from AP (sysID = 1, CompID = 1)
+uint8_t sys1comp0_expectedSeqNum = 0; // used to keep track of MAVLink sequence numbers of msgs received from ADSB subcomponent (sysID = 1, CompID = 0)
 
 // Define functions.
 
 /*============================
+ * mavlink_param_value_receive()
+ *
+ * Looks for a MAVLink PARAM_VALE (#22) msg, with specific param_id/name, in msgs received from the AP.
+ * If it finds it, before we hit the timeout, it returns the value etc.
+ *
+ * This function is often called during a mavlink_get_one_param_from_ap(), after the specific
+ * param has been requested.
+ *
+ *
+ * INPUTS
+ *  name        - the param_id/name of the param we want to get e.g "BATT_ARM_VOLT"
+ *  valuetype   - is the value we are requesting an INT or a FLOAT? https://mavlink.io/en/messages/common.html#MAV_PARAM_TYPE
+ *
+ * OUTPUT
+ *  Either value_int OR value_float will have been set if we were successful, depending on valuetype
+ *  AND always set the other to 0 (just for tidiness)
+ *
+ * RETURNS
+ *  TRUE    - if we got the param's value successfully from the AP
+ *  FALSE   - if not
+ *
+ *============================*/
+bool mavlink_receive_param_value(char *name, int32_t *value_int, float *value_float, uint8_t valuetype)
+{
+    debugPrintln("mavlink_receive_param_value() - Starting");
+
+    debugPrint("mavlink_receive_param_value() - name:");
+    Serial.println(name);
+    debugPrint("mavlink_receive_param_value() - value_int:");
+    Serial.println(*value_int);
+    debugPrint("mavlink_receive_param_value() - value_float:");
+    Serial.println(*value_float);
+    debugPrint("mavlink_receive_param_value() - valuetype:");
+    Serial.println(valuetype);
+
+    mavlink_message_t msg;
+    mavlink_status_t status;
+    
+    char param_i_want_to_get[16] = {}; // e.g. "BATT_ARM_VOLT";
+
+    bool gotDesiredMsg = false;
+    bool timedOutOuter = false; // track when we have timed out for the outer while()
+    uint32_t startOuter = 0;
+
+    bool gotFullMsg = false;
+    bool timedOutInner = false; // track when we have timed out for the inner while()
+    uint32_t startInner = 0;
+
+    memcpy(param_i_want_to_get, name, sizeof(param_i_want_to_get));
+
+    // The Outer while() - will keep looking for MAVLink PARAM_VALE (#22) msg AND with the desired param_id/name or timeout
+    startOuter = millis(); // take a millis() timestamp when we start the outer while()
+    while (!gotDesiredMsg && !timedOutOuter)
+    {
+        //debugPrint(" o ");
+        // The Inner while() - will keep trying to assemble a Full MAVLink msg (of any type) or timeout
+        startInner = millis(); // take a millis() timestamp when we start the inner while()
+        timedOutInner = false;
+        while (Serial1.available() && !gotFullMsg && !timedOutInner)
+        {
+            uint8_t c = Serial1.read();
+            //  add new char to what we have so far
+            if (mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) // and see of we have a full Mavlink msg yet
+            {
+                gotFullMsg = true; // will cause us to bust out of the while()
+                //debugPrintln("F");
+            }
+            else
+            {
+                //debugPrintln("c");
+            }
+
+            // Check if we have timed out, which will be evaluated at next pass through the while()
+            if ((millis() - startInner) >= (FMX_MAVLINK_RX_WINDOW_REGULAR_MS))
+            {
+                timedOutInner = true;
+                debugPrintln("mavlink_receive_param_value() - WARNING - we timed out on Inner while()");
+            }
+        } // END of the inner while()
+
+        // At this point we either;
+        // a) have a Full Msg OR
+        // b) there were no more chars available on the MAVLink serial link so we just exit OR
+        // c) we timed out before gathering a Full Msg, so we just exit.
+
+        if (gotFullMsg) // if we do then lets process it, else we exit.
+        {
+            debugPrint("msg#"); debugPrintInt(msg.msgid);
+            gotFullMsg = false; // clear the flag for future re use.
+            if (msg.msgid == MAVLINK_MSG_ID_PARAM_VALUE) //  #22  https://mavlink.io/en/messages/common.html#PARAM_VALUE
+            {
+                // decode the body of the PARAM_VALUE msg
+                mavlink_param_value_t param_value;
+                mavlink_msg_param_value_decode(&msg, &param_value);
+                debugPrint("mavlink_receive_param_value() - got a full MAVLink PARAM_VALUE msg - param_id:"); Serial.println(param_value.param_id);
+                if (param_value.param_id[0] == param_i_want_to_get[0]) // is it for the specific PARAM we are looking for?
+                {
+                    // XXX - the above if (...) needs to match the whole string, not just first char
+                    debugPrintln("mavlink_receive_param_value() - and its the one we wanted");
+                    gotDesiredMsg = true;
+                    // print its guts
+                    debugPrintln("PARAM_VALUE");
+                    Serial.print("    param_id:");Serial.println(param_value.param_id);
+                    Serial.print(" param_value:");Serial.println(param_value.param_value);
+                    Serial.print("  param_type:");Serial.println(param_value.param_type);
+                    Serial.print(" param_count:");Serial.println(param_value.param_count);
+                    Serial.print(" param_index:");Serial.println(param_value.param_index);
+
+                    // use its guts
+                    if ((param_value.param_value >= MAV_PARAM_TYPE_UINT8) && (param_value.param_value <= MAV_PARAM_TYPE_INT32)) // i.e. an INT
+                    {
+                        *value_int = param_value.param_value;
+                        *value_float = 0.0;
+                    }
+                    if (param_value.param_type == MAV_PARAM_TYPE_REAL32)
+                    {
+                        *value_float = param_value.param_value;
+                        *value_int = 0;
+                    }
+                } // END - of IF we have the correct param_id
+            }     // END - of IF we have a PARAM_VALUE mavlink packet
+        }         // END - of IF we have a full mavlink packet
+
+        // Check if we have timed out on the Outer while(), which will be evaluated at next pass through the while()
+        if ((millis() - startOuter) >= (FMX_MAVLINK_RX_WINDOW_LONG_MS))
+        {
+            timedOutOuter = true;
+            debugPrintln("mavlink_receive_param_value() - WARNING - we timed out on Outer while()");
+        }
+
+    } // END of while() outer loop
+
+    debugPrint("mavlink_receive_param_value() - Complete. Result=");
+    if (gotDesiredMsg)
+        debugPrintln("TRUE");
+    else
+        debugPrintln("FALSE");
+
+    return (gotDesiredMsg); // tell our caller if we succeeded in getting the PARAM_VALUE MAVlink msg, with the desired param_id/name.
+
+} // END - mavlink_receive_param_value()
+
+/*============================
  * mavlink_receive()
  *
- * Function called to read any MAVlink messages sent by serial communication from AutoPilot(AP) to Arduino.
+ * Assembles inbound MAVlink messages (character by character) sent by serial communication from AutoPilot(AP) to Arduino.
+ * It may take multiple calls of this function before it has assembled a Full MAVLink msg.
+ * Once it has a Full MAVLink msg, we process it.
+ * We only ever process a maximum of one msg per call of this function.
+ * We use a timeout to ensure this function is timebound.
  *
  * This function is called for two reasons;
  * i) To receive messages the AP is streaming out its serial port, after we have requested then via mavlink_request_datastream()
@@ -36,26 +185,37 @@ void mavlink_receive()
     // debugPrintln("mavlink_receive() - Executing");
     mavlink_message_t msg;
     mavlink_status_t status;
+
     bool gotFullMsg = false;
-    // debugPrintln("char?");
-    while (Serial1.available() && !gotFullMsg) // xxx - I should prob put a time limiter on this WHILE, I think the only reason
-                                               // it is not hogging the CPU is because the AutoPilot cube only sends msgs each
-                                               // second, and then pauses I think, is why the WHILE breaks out.
+
+    bool timedOut = false; // track when we have timed out.
+    uint32_t start = 0;
+
+    start = millis(); // take a millis() timestamp when we start.
+
+    while (Serial1.available() && !gotFullMsg && !timedOut)
     {
         uint8_t c = Serial1.read();
-        // debugPrintln("got char");
-        //  add new char to what we have so far and see of we have a full Mavlink msg yet
-        if (mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) // if we do then bust out of this char collecting loop.
-            gotFullMsg = true;
+        //  add new char to what we have so far
+        if (mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) // and see of we have a full Mavlink msg yet
+            gotFullMsg = true;                                    // will cause us to bust out of the while()
+
+        // Check if we have timed out, which will be evaluated at next pass through the while()
+        if ((millis() - start) >= (FMX_MAVLINK_RX_WINDOW_REGULAR_MS))
+        {
+            timedOut = true;
+            debugPrintln("void mavlink_receive() - WARNING - we timed out");
+        }
     }
 
-    // At this point we either have a Full Msg OR there were no more chars available on the MAVLink serial link.
+    // At this point we either;
+    // a) have a Full Msg OR
+    // b) there were no more chars available on the MAVLink serial link so we just exit OR
+    // c) we timed out before gathering a Full Msg, so we just exit.
 
     if (gotFullMsg && (msg.sysid == 1) && (msg.compid == 1)) // if we do AND its from the AutoPilot (not the ADSB module etc) then lets process it
     {
-#ifdef MAVLINK_DEBUG
-        // debugs to show the msg # of the ones I'm seeing but not interested in.
-        
+
         // Check if we have missed any msg's my checking seq number of received MAVLink msg against last on from that sysID/compID.
         // Note (1): the first msg we receive from a particular sysID/compID will always fail the below test, thats ok and expected.
         // Note (2): my Cube Orange identifies itself as sysID 1, compID 1.  The ADSB controller that is on the Cube Orange carrier board
@@ -73,7 +233,7 @@ void mavlink_receive()
         //         debugPrintln("mavlink_receive() - WARNING - MSG(s) missed from sysID:1,compID:0 according to seq nums!");
         //     sys1comp0_expectedSeqNum = msg.seq+1;   // as its a uint8_t it will roll correctly at seq = 255, the next will be seq = 0.
         // }
-
+#ifdef MAVLINK_DEBUG
         debugPrint("MSG RCVD -");
         debugPrint(" magic:");
         debugPrintInt(msg.magic);
@@ -106,7 +266,7 @@ void mavlink_receive()
             Serial.print(hb.autopilot);
             Serial.print(" BaseMode:");
             Serial.print(hb.base_mode);
-            if ((hb.base_mode == 1) || (hb.base_mode == 65))  // https://ardupilot.org/rover/docs/parameters.html#mode1
+           if ((hb.base_mode == 1) || (hb.base_mode == 65))  // https://ardupilot.org/rover/docs/parameters.html#mode1
                 Serial.print( " DISarmed");
             if ((hb.base_mode == 129) || (hb.base_mode == 193))
                 Serial.print( " !!ARMED!!");
@@ -122,13 +282,25 @@ void mavlink_receive()
             Serial.print(hb.system_status);
             Serial.print(" MavVer:");
             Serial.print(hb.mavlink_version);
-            
+
 #endif
 
             seconds_since_last_mavlink_heartbeat_rx = 0; // reset this timer as we just got a HEARTBEAT from the AP.
 
-
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            // Note, because the GCS and even the ADSB sub controller in the Cube baseboard are separate MAVLink "Components", they emit
+            // their own HEARTBEAT msgs. SO below I need to check that I ONLY copy data from the AutoPilot HEARTBEATS, and not the GCS
+            // or ADSB node HEARTBEATS.
+            if (hb.type == MAV_TYPE_SURFACE_BOAT)
+            {
+                myFmxSettings.AP_BASEMODE = hb.base_mode;         // https://github.com/ArduPilot/ardupilot/blob/477fb4c408fa0054f600e088fddcd0f8ab3bb4a9/Rover/GCS_Mavlink.cpp#L15
+                myFmxSettings.AP_CUSTOMMODE = hb.custom_mode;     // https://github.com/ArduPilot/ardupilot/blob/477fb4c408fa0054f600e088fddcd0f8ab3bb4a9/Rover/GCS_Mavlink.cpp#L52
+                myFmxSettings.AP_SYSTEMSTATUS = hb.system_status; // https://github.com/ArduPilot/ardupilot/blob/477fb4c408fa0054f600e088fddcd0f8ab3bb4a9/Rover/GCS_Mavlink.cpp#L57
+            }
+#endif
             break;
+
         }
 
         //============================
@@ -150,9 +322,6 @@ void mavlink_receive()
             Serial.print(" param_index");
             Serial.print(param_value.param_index);
 #endif
-
-            // Save things I'm interested in to FeatherMx data structure for use later.
-            // See example of this in "case MAVLINK_MSG_ID_HEARTBEAT:" above.
 
             break;
         }
@@ -188,6 +357,12 @@ void mavlink_receive()
             Serial.print(packet.satellites_visible);
 #endif
 
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            myFmxSettings.AP_VEL = packet.vel;
+            myFmxSettings.AP_COG = packet.cog;
+            myFmxSettings.AP_SATS = packet.satellites_visible;
+#endif
             break;
         }
 
@@ -205,7 +380,6 @@ void mavlink_receive()
             Serial.print(packet.I2Cerr);
             debugPrint("errors");
 #endif
-
             break;
         }
 
@@ -225,6 +399,12 @@ void mavlink_receive()
             Serial.print(packet.flags);
 #endif
 
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            myFmxSettings.AP_VCC = packet.Vcc;
+            myFmxSettings.AP_VSERVO = packet.Vservo;
+            myFmxSettings.AP_POWERFLAGS = packet.flags;
+#endif
             break;
         }
 
@@ -257,6 +437,15 @@ void mavlink_receive()
             debugPrint("cdeg");
 #endif
 
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            myFmxSettings.AP_POSITIONTIMESTAMP = packet.time_boot_ms;
+            myFmxSettings.AP_LAT = packet.lat;
+            myFmxSettings.AP_LON = packet.lon;
+            myFmxSettings.AP_VX = packet.vx;
+            myFmxSettings.AP_VY = packet.vy;
+            myFmxSettings.AP_HDG = packet.hdg;
+#endif
             break;
         }
 
@@ -309,7 +498,6 @@ void mavlink_receive()
             debugPrint("start_stop:");
             Serial.print(packet.start_stop);
 #endif
-
             break;
         }
 
@@ -341,6 +529,13 @@ void mavlink_receive()
             Serial.print(packet.load);
 #endif
 
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            myFmxSettings.AP_SENSORSPRESENT = packet.onboard_control_sensors_present;
+            myFmxSettings.AP_SENSORSENABLED = packet.onboard_control_sensors_enabled;
+            myFmxSettings.AP_SENSORSHEALTH = packet.onboard_control_sensors_health;
+            myFmxSettings.AP_LOAD = packet.load;
+#endif
             break;
         }
 
@@ -358,6 +553,11 @@ void mavlink_receive()
             Serial.print(packet.time_boot_ms);
 #endif
 
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            myFmxSettings.AP_TIMEUNIXUSEC = packet.time_unix_usec;
+            myFmxSettings.AP_TIMEBOOTMS = packet.time_boot_ms;
+#endif
             break;
         }
 
@@ -377,6 +577,12 @@ void mavlink_receive()
             Serial.print(packet.wp_dist);
 #endif
 
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            myFmxSettings.AP_NAVBEARING = packet.nav_bearing;
+            myFmxSettings.AP_TARGETBEARING = packet.target_bearing;
+            myFmxSettings.AP_WPDIST = packet.wp_dist;
+#endif
             break;
         }
 
@@ -397,6 +603,12 @@ void mavlink_receive()
             Serial.print(packet.current_battery);
 #endif
 
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            myFmxSettings.AP_VOLTAGES[0] = packet.voltages[0];
+            myFmxSettings.AP_VOLTAGES[1] = packet.voltages[1];
+            myFmxSettings.AP_CURRENTBATTERY = packet.current_battery;
+#endif
             break;
         }
 
@@ -414,6 +626,11 @@ void mavlink_receive()
             Serial.print(packet.product_id);
 #endif
 
+#ifdef FMX
+            // Save things I'm interested in to FeatherMx data structure for use later.
+            myFmxSettings.AP_VENDORID = packet.vendor_id;
+            myFmxSettings.AP_PRODUCTID = packet.product_id;
+#endif
             break;
         }
 
@@ -430,7 +647,6 @@ void mavlink_receive()
             Serial.print(" result:");
             Serial.print(ca.result);
 #endif
-
             break;
         }
 
@@ -447,7 +663,6 @@ void mavlink_receive()
             debugPrint(" text:");
             Serial.print(packet.text);
 #endif
-
             break;
         }
 
@@ -462,6 +677,7 @@ void mavlink_receive()
 #ifdef MAVLINK_DEBUG
         debugPrintln("");
 #endif
+
     } // END - of IF we have a full mavlink packet lets process it
 
 } // END - mavlink_receive()
