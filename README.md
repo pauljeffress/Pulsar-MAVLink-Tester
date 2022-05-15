@@ -24,37 +24,37 @@ https://discuss.ardupilot.org/t/mavlink-step-by-step/9629
 Once the code is running on your Arduino, open the Serial Monitor and press 'm' to open the menu system in the tester.
 You should see a menu something like this;
 
-> - Pulsar MAVLink Tester -
-> =========================
-> 
-> [1].......Toggle mavlink_receive() in loop(): [OFF]
-> [2].......STREAM   - mavlink_request_datastream(MAV_DATA_STREAM_RAW_SENSORS)
-> [3].......STREAM   - mavlink_unrequest_datastream(MAV_DATA_STREAM_ALL);
-> [4].......STREAM   - mavlink_request_streaming_params_from_ap()
-> [5].......STREAM   - mavlink_unrequest_streaming_params_from_ap()
-> 
-> [6].......ARM      - mavlink_set_arm_ap()
-> [7].......DISarm   - mavlink_set_disarm_ap()
-> 
-> [8].......SET      - mavlink_test_set_one_param_on_ap()
-> [9].......REQUEST  - mavlink_test_request_one_param_on_ap()
-> 
-> [r].......REBOOT   - mavlink_cmd_preflight_reboot_ap()
-> 
-> [M].......FLT MODE - mavlink_set_flightmode_ap(0)- MANUAL
-> [H].......FLT MODE - mavlink_set_flightmode_ap(4)- HOLD
-> [A].......FLT MODE - mavlink_set_flightmode_ap(10)- AUTO
-> 
-> [C].......MISSION  - clear local data
-> [L].......MISSION  - load dummy local data
-> [P].......MISSION  - print my local data
-> [U].......MISSION  - upload local data to AP
-> [E].......MISSION  - erase AP's mission
-> 
-> [x].......Exit this Menu
-> 
-> Enter your choice/number: 
-> 
+....- Pulsar MAVLink Tester -
+....=========================
+....
+....[1].......Toggle mavlink_receive() in loop(): [OFF]
+....[2].......STREAM   - mavlink_request_datastream(MAV_DATA_STREAM_RAW_SENSORS)
+....[3].......STREAM   - mavlink_unrequest_datastream(MAV_DATA_STREAM_ALL);
+....[4].......STREAM   - mavlink_request_streaming_params_from_ap()
+....[5].......STREAM   - mavlink_unrequest_streaming_params_from_ap()
+....
+....[6].......ARM      - mavlink_set_arm_ap()
+....[7].......DISarm   - mavlink_set_disarm_ap()
+....
+....[8].......SET      - mavlink_test_set_one_param_on_ap()
+....[9].......REQUEST  - mavlink_test_request_one_param_on_ap()
+....
+....[r].......REBOOT   - mavlink_cmd_preflight_reboot_ap()
+....
+....[M].......FLT MODE - mavlink_set_flightmode_ap(0)- MANUAL
+....[H].......FLT MODE - mavlink_set_flightmode_ap(4)- HOLD
+....[A].......FLT MODE - mavlink_set_flightmode_ap(10)- AUTO
+....
+....[C].......MISSION  - clear local data
+....[L].......MISSION  - load dummy local data
+....[P].......MISSION  - print my local data
+....[U].......MISSION  - upload local data to AP
+....[E].......MISSION  - erase AP's mission
+....
+....[x].......Exit this Menu
+....
+....Enter your choice/number: 
+....
 
 
 I'd suggest you start by using option 1, to turn on the mavlink_receive() function in loop(), and then press 'x' to get out of the menus.
