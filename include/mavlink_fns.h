@@ -151,8 +151,8 @@ void mavlink_set_disarm_ap();
 void mavlink_set_flightmode_ap(uint8_t desired_flightmode);
 void mavlink_cmd_preflight_reboot_ap();
 // from mavlink_stream_fns.cpp
-void mavlink_request_datastream();
-void mavlink_unrequest_datastream();
+void mavlink_request_datastream(uint8_t data_stream);
+void mavlink_unrequest_datastream(uint8_t data_stream);
 void mavlink_request_streaming_params_from_ap();
 void mavlink_unrequest_streaming_params_from_ap();
 // from mavlink_receive_fns.cpp

@@ -51,7 +51,7 @@ void mavlink_receive()
 
     // At this point we either have a Full Msg OR there were no more chars available on the MAVLink serial link.
 
-    if (gotFullMsg) // if we do then lets process it
+    if (gotFullMsg && (msg.sysid == 1) && (msg.compid == 1)) // if we do AND its from the AutoPilot (not the ADSB module etc) then lets process it
     {
 #ifdef MAVLINK_DEBUG
         // debugs to show the msg # of the ones I'm seeing but not interested in.
@@ -74,14 +74,14 @@ void mavlink_receive()
         //     sys1comp0_expectedSeqNum = msg.seq+1;   // as its a uint8_t it will roll correctly at seq = 255, the next will be seq = 0.
         // }
 
-        debugPrint("mavlink_receive() - MSG RCVD -");
+        debugPrint("MSG RCVD -");
         debugPrint(" magic:");
         debugPrintInt(msg.magic);
         debugPrint(" seq:");
         debugPrintInt(msg.seq);
-        debugPrint(" src sysid:");
+        debugPrint(" sysid:");
         debugPrintInt(msg.sysid);
-        debugPrint(" src compid:");
+        debugPrint(" compid:");
         debugPrintInt(msg.compid);
         debugPrint(" msgid#:");
         debugPrintInt(msg.msgid);
@@ -102,16 +102,27 @@ void mavlink_receive()
             debugPrint("=HEARTBEAT");
             Serial.print(" Type:");
             Serial.print(hb.type);
-            Serial.print(" Autopilot:");
+            Serial.print(" APclass:");
             Serial.print(hb.autopilot);
             Serial.print(" BaseMode:");
             Serial.print(hb.base_mode);
-            Serial.print(" CustomMode/Flightmode:");
+            if ((hb.base_mode == 1) || (hb.base_mode == 65))  // https://ardupilot.org/rover/docs/parameters.html#mode1
+                Serial.print( " DISarmed");
+            if ((hb.base_mode == 129) || (hb.base_mode == 193))
+                Serial.print( " !!ARMED!!");
+            Serial.print(" Custom/Flightmode:");
             Serial.print(hb.custom_mode);
-            Serial.print(" SystemStatus:");
+            if (hb.custom_mode == 0)
+                Serial.print( " MANUAL");
+            if (hb.custom_mode == 4)
+                Serial.print( " HOLD");
+            if (hb.custom_mode == 10)
+                Serial.print( " !!AUTO!!");
+            Serial.print(" SysStat:");
             Serial.print(hb.system_status);
-            Serial.print(" MavlinkVersion:");
+            Serial.print(" MavVer:");
             Serial.print(hb.mavlink_version);
+            
 #endif
 
             seconds_since_last_mavlink_heartbeat_rx = 0; // reset this timer as we just got a HEARTBEAT from the AP.

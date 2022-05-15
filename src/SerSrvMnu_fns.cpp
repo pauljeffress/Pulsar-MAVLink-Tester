@@ -40,20 +40,29 @@ void menuPrint()
         Serial.println("[ON]");
     else
         Serial.println("[OFF]");
-    Serial.println("[2].......mavlink_request_datastream()");
-    Serial.println("[3].......mavlink_unrequest_datastream()");
-    Serial.println("[4].......mavlink_request_streaming_params_from_ap()");
-    Serial.println("[5].......mavlink_unrequest_streaming_params_from_ap()");
-    Serial.println("[6].......mavlink_set_arm_ap()");
-    Serial.println("[7].......mavlink_set_disarm_ap()");
-    Serial.println("[8].......mavlink_test_set_one_param_on_ap()");
-    Serial.println("[9].......mavlink_test_request_one_param_on_ap()");
-    Serial.println("[a].......mavlink_set_flightmode_ap(0)- MANUAL");
-    Serial.println("[b].......mavlink_set_flightmode_ap(3)- STEERING");
-    Serial.println("[r].......mavlink_cmd_preflight_reboot_ap()");
-
+    Serial.println("[2].......STREAM   - mavlink_request_datastream(MAV_DATA_STREAM_RAW_SENSORS)");
+    Serial.println("[3].......STREAM   - mavlink_unrequest_datastream(MAV_DATA_STREAM_ALL);");
+    Serial.println("[4].......STREAM   - mavlink_request_streaming_params_from_ap()");
+    Serial.println("[5].......STREAM   - mavlink_unrequest_streaming_params_from_ap()");
     Serial.println();
-
+    Serial.println("[6].......ARM      - mavlink_set_arm_ap()");
+    Serial.println("[7].......DISarm   - mavlink_set_disarm_ap()");
+    Serial.println();
+    Serial.println("[8].......SET      - mavlink_test_set_one_param_on_ap()");
+    Serial.println("[9].......REQUEST  - mavlink_test_request_one_param_on_ap()");
+    Serial.println();
+    Serial.println("[r].......REBOOT   - mavlink_cmd_preflight_reboot_ap()");
+    Serial.println();
+    Serial.println("[M].......FLT MODE - mavlink_set_flightmode_ap(0)- MANUAL");
+    Serial.println("[H].......FLT MODE - mavlink_set_flightmode_ap(4)- HOLD");
+    Serial.println("[A].......FLT MODE - mavlink_set_flightmode_ap(10)- AUTO");
+    Serial.println();
+    Serial.println("[C].......MISSION  - clear local data");
+    Serial.println("[L].......MISSION  - load dummy local data");
+    Serial.println("[P].......MISSION  - print my local data");
+    Serial.println("[U].......MISSION  - upload local data to AP");
+    Serial.println("[E].......MISSION  - erase AP's mission");
+    Serial.println();
     Serial.println("[x].......Exit this Menu");
     Serial.println();
     Serial.print("Enter your choice/number: ");
@@ -96,14 +105,14 @@ void menuDo()
         else if (MenuChoice == "2")
         {
             menuClearScreen();
-            mavlink_request_datastream();
-            menuGoBack(); // display [0] to exit msg and wait
+            mavlink_request_datastream(MAV_DATA_STREAM_RAW_SENSORS);
+            //menuGoBack(); // display [0] to exit msg and wait
         }
         else if (MenuChoice == "3")
         {
             menuClearScreen();
-            mavlink_unrequest_datastream();
-            menuGoBack(); // display [0] to exit msg and wait
+            mavlink_unrequest_datastream(MAV_DATA_STREAM_ALL);
+            //menuGoBack(); // display [0] to exit msg and wait
         }
         else if (MenuChoice == "4")
         {
@@ -146,7 +155,7 @@ void menuDo()
             mavlink_test_request_one_param_from_ap();
             menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
         }
-        else if (MenuChoice == "a")
+        else if (MenuChoice == "M")
         {
             menuClearScreen();
             MavRecOn = true;    // in order to see the result of the below command, we need
@@ -154,12 +163,20 @@ void menuDo()
             mavlink_set_flightmode_ap(0);   // 0 = MANUAL (see https://github.com/ardupilot/ardupilot/blob/master/Rover/mode.h#L21)
             menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
         }
-        else if (MenuChoice == "b")
+        else if (MenuChoice == "H")
         {
             menuClearScreen();
             MavRecOn = true;    // in order to see the result of the below command, we need
                                 // our mavlink_receive() function to be call in loop().
-            mavlink_set_flightmode_ap(3);   // 3 = STEERING (see https://github.com/ardupilot/ardupilot/blob/master/Rover/mode.h#L21)
+            mavlink_set_flightmode_ap(4);   // 4 = HOLD (see https://github.com/ardupilot/ardupilot/blob/master/Rover/mode.h#L21)
+            menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
+        }
+        else if (MenuChoice == "A")
+        {
+            menuClearScreen();
+            MavRecOn = true;    // in order to see the result of the below command, we need
+                                // our mavlink_receive() function to be call in loop().
+            mavlink_set_flightmode_ap(10);   // 10 = AUTO (see https://github.com/ardupilot/ardupilot/blob/master/Rover/mode.h#L21)
             menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
         }
         else if (MenuChoice == "r")
@@ -169,6 +186,31 @@ void menuDo()
                                 // our mavlink_receive() function to be call in loop().
             mavlink_cmd_preflight_reboot_ap();   
             menuExit();     // Immediately exit menu system (because we want to catch the results of the above command)
+        }
+        else if (MenuChoice == "C")
+        {
+            menuClearScreen();
+            global_mission_init();  
+        }
+        else if (MenuChoice == "L")
+        {
+            menuClearScreen();
+            global_mission_dummy_load();   
+        }
+        else if (MenuChoice == "P")
+        {
+            menuClearScreen();
+            global_mission_print();   
+        }
+        else if (MenuChoice == "U")
+        {
+            menuClearScreen();
+            mission_upload_to_ap();
+        }
+        else if (MenuChoice == "E")
+        {
+            menuClearScreen();
+            mission_clear_all_ap();   
         }
         else if (MenuChoice == "x")
         {

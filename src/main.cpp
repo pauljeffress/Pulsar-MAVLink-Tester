@@ -13,6 +13,7 @@
 // ======================= 
 
 bool MavRecOn = false;
+bool HideSomeOn = false;
 
 
 

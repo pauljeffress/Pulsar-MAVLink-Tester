@@ -16,13 +16,16 @@
 // Define functions.
 
 /*
- *  request_datastream()
- *  ====================
- *  Called to read, decode and display any MAVlink messages sent via serial communication from AutoPilot to Arduino
- *  Note: Not all MAVLink message types are decoded, I have only got enough code in here to decode the ones I am
- *        interested in.  Additional case statements can be added to decode additional messages as need be.
+ * mavlink_request_datastream(...)
+ * ===============================
+ * Tells AP to turn on streaming of one of the predefined sets of
+ * parameters, as defined in https://mavlink.io/en/messages/common.html#MAV_DATA_STREAM
+ * 
+ * INPUTS
+ *    data_stream = https://mavlink.io/en/messages/common.html#MAV_DATA_STREAM
+ *                  e.g MAV_DATA_STREAM_ALL or MAV_DATA_STREAM_RAW_SENSORS
  */
-void mavlink_request_datastream()
+void mavlink_request_datastream(uint8_t data_stream)
 {
     debugPrintln("mavlink_request_datastream() - Executing");
     // source and dest MAVLink addressing info.
@@ -31,30 +34,9 @@ void mavlink_request_datastream()
     uint8_t _target_system = AP_SYS_ID;     // MAVLink System ID of the autopilot.
     uint8_t _target_component = AP_COMP_ID; // MAVLink Component ID of the autopilot.
 
-    uint8_t _req_stream_id = MAV_DATA_STREAM_RAW_SENSORS; // MAV_DATA_STREAM_ALL;
+    uint8_t _req_stream_id = data_stream;   // MAV_DATA_STREAM_ALL;
     uint16_t _req_message_rate = 0x01;                    // number of times per second to request the data in hex
     uint8_t _start_stop = 1;                              // 1 = start, 0 = stop
-
-    // STREAMS that can be requested
-    /*
-     * Definitions are in common.h: enum MAV_DATA_STREAM and more importantly at:
-       https://mavlink.io/en/messages/common.html#MAV_DATA_STREAM
-     *
-     * MAV_DATA_STREAM_ALL=0, // Enable all data streams
-     * MAV_DATA_STREAM_RAW_SENSORS=1, // Enable IMU_RAW, GPS_RAW, GPS_STATUS packets.
-     * MAV_DATA_STREAM_EXTENDED_STATUS=2, // Enable GPS_STATUS, CONTROL_STATUS, AUX_STATUS
-     * MAV_DATA_STREAM_RC_CHANNELS=3, // Enable RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW
-     * MAV_DATA_STREAM_RAW_CONTROLLER=4, // Enable ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT.
-     * MAV_DATA_STREAM_POSITION=6, // Enable LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages.
-     * MAV_DATA_STREAM_EXTRA1=10, // Dependent on the autopilot
-     * MAV_DATA_STREAM_EXTRA2=11, // Dependent on the autopilot
-     * MAV_DATA_STREAM_EXTRA3=12, // Dependent on the autopilot
-     * MAV_DATA_STREAM_ENUM_END=13,
-     *
-     * Data in PixHawk available in:
-     *  - Battery, amperage and voltage (SYS_STATUS) in MAV_DATA_STREAM_EXTENDED_STATUS
-     *  - Gyro info (IMU_SCALED) in MAV_DATA_STREAM_EXTRA1
-     */
 
     // Initialize the required buffers
     mavlink_message_t msg;
@@ -68,12 +50,18 @@ void mavlink_request_datastream()
     debugPrintln("mavlink_request_datastream() - Complete");
 } // END - mavlink_request_datastream()
 
-/*============================
- * mavlink_unrequest_datastream()
- *
- * Undo the request made in mavlink_request_datastream()
- *============================*/
-void mavlink_unrequest_datastream()
+
+/*
+ * mavlink_unrequest_datastream(...)
+ * ===============================
+ * Tells AP to turn OFF streaming of one of the predefined sets of
+ * parameters, as defined in https://mavlink.io/en/messages/common.html#MAV_DATA_STREAM
+ * 
+ * INPUTS
+ *    data_stream = https://mavlink.io/en/messages/common.html#MAV_DATA_STREAM
+ *                  e.g MAV_DATA_STREAM_ALL or MAV_DATA_STREAM_RAW_SENSORS
+ */
+void mavlink_unrequest_datastream(uint8_t data_stream)
 {
     debugPrintln("mavlink_unrequest_datastream() - Executing");
     // source and dest MAVLink addressing info.
@@ -82,30 +70,9 @@ void mavlink_unrequest_datastream()
     uint8_t _target_system = AP_SYS_ID;     // MAVLink System ID of the autopilot.
     uint8_t _target_component = AP_COMP_ID; // MAVLink Component ID of the autopilot.
 
-    uint8_t _req_stream_id = MAV_DATA_STREAM_RAW_SENSORS; // MAV_DATA_STREAM_ALL;
+    uint8_t _req_stream_id = data_stream; // use MAV_DATA_STREAM_ALL to stop all streams;
     uint16_t _req_message_rate = 0x01;                    // number of times per second to request the data in hex
     uint8_t _start_stop = 0;                              // 1 = start, 0 = stop
-
-    // STREAMS that can be requested
-    /*
-     * Definitions are in common.h: enum MAV_DATA_STREAM and more importantly at:
-       https://mavlink.io/en/messages/common.html#MAV_DATA_STREAM
-     *
-     * MAV_DATA_STREAM_ALL=0, // Enable all data streams
-     * MAV_DATA_STREAM_RAW_SENSORS=1, // Enable IMU_RAW, GPS_RAW, GPS_STATUS packets.
-     * MAV_DATA_STREAM_EXTENDED_STATUS=2, // Enable GPS_STATUS, CONTROL_STATUS, AUX_STATUS
-     * MAV_DATA_STREAM_RC_CHANNELS=3, // Enable RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW
-     * MAV_DATA_STREAM_RAW_CONTROLLER=4, // Enable ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT.
-     * MAV_DATA_STREAM_POSITION=6, // Enable LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages.
-     * MAV_DATA_STREAM_EXTRA1=10, // Dependent on the autopilot
-     * MAV_DATA_STREAM_EXTRA2=11, // Dependent on the autopilot
-     * MAV_DATA_STREAM_EXTRA3=12, // Dependent on the autopilot
-     * MAV_DATA_STREAM_ENUM_END=13,
-     *
-     * Data in PixHawk available in:
-     *  - Battery, amperage and voltage (SYS_STATUS) in MAV_DATA_STREAM_EXTENDED_STATUS
-     *  - Gyro info (IMU_SCALED) in MAV_DATA_STREAM_EXTRA1
-     */
 
     // Initialize the required buffers
     mavlink_message_t msg;
@@ -118,6 +85,7 @@ void mavlink_unrequest_datastream()
     
     debugPrintln("mavlink_unrequest_datastream() - Complete");
 } // END - mavlink_unrequest_datastream()
+
 
 /*============================
  * mavlink_request_streaming_params_from_ap()
@@ -299,7 +267,7 @@ void mavlink_unrequest_streaming_params_from_ap()
     // UnRequest MAVLINK_MSG_ID_POWER_STATUS (#125) - https://mavlink.io/en/messages/common.html#POWER_STATUS
     mavlink_msg_command_long_pack(_system_id, _component_id, &msg, _target_system, _target_component, _cl_command, _cl_confirmation, _cl_param1, _cl_param2, _cl_param3, _cl_param4, _cl_param5, _cl_param6, _cl_param7);
     uint16_t len = mavlink_msg_to_send_buffer(buf, &msg); // put message into our send buffer and also get it's size in bytes.
-    // Serial1.write(buf, len); //Write data to serial port byte by byte.
+    Serial1.write(buf, len); //Write data to serial port byte by byte.
     delay(500); // give AP 1/2 sec to process before we send next CMD, don't want to DOS it.
 
     // Pack and send remaining messages

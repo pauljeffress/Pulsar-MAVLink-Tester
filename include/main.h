@@ -16,6 +16,7 @@
 
 /* extern global variables */
 extern bool MavRecOn;
+extern bool HideSomeOn;
 
 
 /* function pre defines */
